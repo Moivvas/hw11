@@ -8,6 +8,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 
 from src.database.db import get_db
+from src.database.models import Contact
+
 from src.routes import contacts
 
 app = FastAPI()
@@ -30,6 +32,15 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 async def root(request: Request):
     return templates.TemplateResponse(
         "index.html", {"request": request, "title": "Contacts App"}
+    )
+
+
+@app.get("/features", response_class=HTMLResponse, description="Features Page")
+async def features(request: Request, db: Session = Depends(get_db)):
+    contacts_data = db.query(Contact).all()
+
+    return templates.TemplateResponse(
+        "features.html", {"request": request, "title": "Features", "features_data": contacts_data}
     )
 
 
