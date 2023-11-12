@@ -8,7 +8,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 
 from src.database.db import get_db
-from src.routes import contacts
+from src.database.models import Contact
+
+from src.routes import contacts, auth
 
 app = FastAPI()
 
@@ -33,6 +35,15 @@ async def root(request: Request):
     )
 
 
+@app.get("/features", response_class=HTMLResponse, description="Features Page")
+async def features(request: Request, db: Session = Depends(get_db)):
+    contacts_data = db.query(Contact).all()
+
+    return templates.TemplateResponse(
+        "features.html", {"request": request, "title": "Features", "features_data": contacts_data}
+    )
+
+
 @app.get("/api/healthchecker")
 def healthchecker(db: Session = Depends(get_db)):
     try:
@@ -49,3 +60,4 @@ def healthchecker(db: Session = Depends(get_db)):
 
 
 app.include_router(contacts.router, prefix="/api")
+app.include_router(auth.router, prefix='/api')

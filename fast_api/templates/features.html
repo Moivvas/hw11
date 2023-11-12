@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    <ul>
+        {% for feature in features_data %}
+            <li>{{ feature.first_name }}: {{ feature.last_name }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
