@@ -13,12 +13,13 @@ class ContactBase(BaseModel):
     additional_data: str = None
     created_at: datetime
     updated_at: datetime
+    user_id: int = Field(1, ge=0)
 
     class Config:
         orm_mode = True
 
 class ContactResponse(BaseModel):
-    id: int
+    id: int = 1
     first_name: str
     last_name: str
     email: EmailStr
@@ -27,19 +28,20 @@ class ContactResponse(BaseModel):
     additional_data: str = None
     created_at: datetime
     updated_at: datetime
+    user_id: int = Field(1, ge=0)
 
     class Config:
         orm_mode = True
 
 
 class UserBase(BaseModel):
-    username: str = Field(min_length=6, max_length=12)
+    username: str = Field(min_length=5, max_length=15)
     email: EmailStr
     password: str = Field(min_length=6, max_length=8)
 
 
 class UserResponse(BaseModel):
-    id: int
+    id: int = 1
     username: str
     email: str
     avatar: str

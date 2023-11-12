@@ -12,7 +12,7 @@ async def get_user_by_email(email: str, db: Session) -> User | None:
 async def create_user(body: UserBase, db: Session):
     g = Gravatar(body.email)
 
-    new_user = User(**body.dict(), avatar=g.get_image())
+    new_user = User(**body.model_dump(), avatar=g.get_image())
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
