@@ -16,3 +16,13 @@ class Contact(Base):
     additional_data = Column(String, nullable=True)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    
+    
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True)
+    username = Column(String(50))
+    email = Column(String(150), nullable=False, unique=True)
+    password = Column(String(255), nullable=False)
+    refresh_token = Column(String(255), nullable=True)
+    avatar = Column(String(255), nullable=True)
