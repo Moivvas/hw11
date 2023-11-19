@@ -1,6 +1,7 @@
 from typing import List
 from datetime import date, timedelta
 
+
 from fastapi import Depends, HTTPException, status, Path, APIRouter
 from sqlalchemy.orm import Session
 
@@ -18,6 +19,7 @@ router = APIRouter(prefix="/contacts", tags=["contacts"])
 
 
 @router.get("/", response_model=List[ContactResponse], name="Return contacts")
+
 async def get_contacts(db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)):
     contacts = await repository_contacts.get_contacts(db, current_user)
     return contacts

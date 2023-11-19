@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     postgres_user: str
     postgres_password: str
     postgres_port: int
+    cloudinary_name: str
+    cloudinary_api_key: int
+    cloudinary_api_secret: str
    
 
     class Config:
