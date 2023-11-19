@@ -10,11 +10,13 @@ from jose import JWTError, jwt
 from src.database.db import get_db
 from src.repository import users as repository_users
 
+from src.conf.config import settings
+
 
 class Auth:
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    SECRET_KEY = "secret_key"
-    ALGORITHM = "HS256"
+    SECRET_KEY = settings.secret_key
+    ALGORITHM = settings.algorithm
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
     def verify_password(self, plain_password, hashed_password):
@@ -23,27 +25,41 @@ class Auth:
     def get_password_hash(self, password: str):
         return self.pwd_context.hash(password)
 
-    async def create_access_token(self, data: dict, expires_delta: Optional[float] = None):
+    async def create_access_token(
+        self, data: dict, expires_delta: Optional[float] = None
+    ):
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.utcnow() + timedelta(seconds=expires_delta)
         else:
             expire = datetime.utcnow() + timedelta(minutes=600)
-        to_encode.update({"iat": datetime.utcnow(), "exp": expire, "scope": "access_token"})
-        encoded_access_token = jwt.encode(to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM)
+        to_encode.update(
+            {"iat": datetime.utcnow(), "exp": expire, "scope": "access_token"}
+        )
+        encoded_access_token = jwt.encode(
+            to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM
+        )
         return encoded_access_token
 
-    async def create_refresh_token(self, data: dict, expires_delta: Optional[float] = None):
+    async def create_refresh_token(
+        self, data: dict, expires_delta: Optional[float] = None
+    ):
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.utcnow() + timedelta(seconds=expires_delta)
         else:
             expire = datetime.utcnow() + timedelta(days=7)
-        to_encode.update({"iat": datetime.utcnow(), "exp": expire, "scope": "refresh_token"})
-        encoded_refresh_token = jwt.encode(to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM)
+        to_encode.update(
+            {"iat": datetime.utcnow(), "exp": expire, "scope": "refresh_token"}
+        )
+        encoded_refresh_token = jwt.encode(
+            to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM
+        )
         return encoded_refresh_token
 
-    async def get_current_user(self, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    async def get_current_user(
+        self, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
+    ):
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
@@ -67,15 +83,49 @@ class Auth:
             raise credentials_exception
         return user
 
-    async def decode_refresh_token(self, refresh_token: str):
+    def decode_refresh_token(self, refresh_token: str):
         try:
-            payload = jwt.decode(refresh_token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
-            if payload['scope'] == 'refresh_token':
-                email = payload['sub']
+            payload = jwt.decode(
+                refresh_token, self.SECRET_KEY, algorithms=[self.ALGORITHM]
+            )
+            if payload["scope"] == "refresh_token":
+                email = payload["sub"]
                 return email
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid scope for token')
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid scope for token",
+            )
         except JWTError:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials')
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate credentials",
+            )
+
+    def create_email_token(self, data: dict):
+        to_encode = data.copy()
+        expire = datetime.utcnow() + timedelta(days=1)
+        to_encode.update(
+            {"iat": datetime.utcnow(), "exp": expire, "scope": "email_token"}
+        )
+        token = jwt.encode(to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM)
+        return token
+
+    def get_email_from_token(self, token: str):
+        try:
+            payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
+            if payload["scope"] == "email_token":
+                email = payload["sub"]
+                return email
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid scope for token",
+            )
+        except JWTError as e:
+            print(e)
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Invalid token for email verification",
+            )
 
 
 auth_service = Auth()

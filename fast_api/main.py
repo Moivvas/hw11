@@ -6,6 +6,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from sqlalchemy import text
+from starlette.middleware.cors import CORSMiddleware
 
 from src.database.db import get_db
 from src.database.models import Contact
@@ -14,6 +15,13 @@ from src.routes import contacts, auth
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.middleware("http")
 async def custom_middleware(request: Request, call_next):
