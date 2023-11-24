@@ -10,6 +10,15 @@ from src.schemas import ContactBase
 
 
 async def get_contacts(db: Session, user: User):
+    """
+    The get_contacts function returns a list of contacts for the user.
+        
+    
+    :param db: Session: Pass the database session to the function
+    :param user: User: Get the user_id of the current user
+    :return: A list of contacts
+    :doc-author: Trelent
+    """
     contacts = db.query(Contact).filter_by(user_id=user.id).all()
     return contacts
 
@@ -25,6 +34,16 @@ async def get_contact_by_email(email: str, user_id: int, db: Session):
 
 
 async def create(body: ContactBase, db: Session, user: User):
+    """
+    The create function creates a new contact in the database.
+        
+    
+    :param body: ContactBase: Pass in the data from the request body
+    :param db: Session: Access the database
+    :param user: User: Get the user id of the current logged in user
+    :return: The contact object
+    :doc-author: Trelent
+    """
     contact = Contact(**body.model_dump(), user_id=user.id)
     db.add(contact)
     db.commit()
@@ -33,6 +52,17 @@ async def create(body: ContactBase, db: Session, user: User):
 
 
 async def update(id: int, body: ContactBase, user_id: int, db: Session):
+    """
+    The update function updates a contact in the database.
+        
+    
+    :param id: int: Identify the contact that will be updated
+    :param body: ContactBase: Get the data from the request body
+    :param user_id: int: Check if the contact belongs to the user
+    :param db: Session: Access the database
+    :return: A contact
+    :doc-author: Trelent
+    """
     contact = await get_contact_by_id(id, db)
     if contact and contact.user_id == user_id:
         contact.email = body.email
@@ -43,6 +73,16 @@ async def update(id: int, body: ContactBase, user_id: int, db: Session):
 
 
 async def remove(id: int, user_id: int, db: Session):
+    """
+    The remove function removes a contact from the database.
+        
+    
+    :param id: int: Specify the id of the contact to be deleted
+    :param user_id: int: Check if the user is authorized to delete the contact
+    :param db: Session: Pass the database session to the function
+    :return: A contact object if it exists, otherwise none
+    :doc-author: Trelent
+    """
     contact = await get_contact_by_id(id, db)
     if contact and contact.user_id == user_id:
         db.delete(contact)

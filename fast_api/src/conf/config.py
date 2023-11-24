@@ -12,13 +12,13 @@ class Settings(BaseSettings):
     mail_server: str = 'smtp.meta.ua'
     redis_host: str = 'localhost'
     redis_port: int = 6379
-    postgres_db: str
-    postgres_user: str
-    postgres_password: str
-    postgres_port: int
-    cloudinary_name: str
-    cloudinary_api_key: int
-    cloudinary_api_secret: str
+    postgres_db: str = 'db'
+    postgres_user: str = 'some_user'
+    postgres_password: str = 'password'
+    postgres_port: int = '8000'
+    cloudinary_name: str = 'Cloudinary'
+    cloudinary_api_key: int = '12903053'
+    cloudinary_api_secret: str = 'secret'
    
 
     class Config:
