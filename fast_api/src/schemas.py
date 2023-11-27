@@ -35,7 +35,7 @@ class ContactResponse(BaseModel):
 
 
 class UserBase(BaseModel):
-    username: str = Field(min_length=5, max_length=15)
+    username: str = Field(min_length=3, max_length=15)
     email: EmailStr
     password: str = Field(min_length=6, max_length=8)
 

@@ -24,11 +24,17 @@ pydantic = {extras = ["email"], version = "^2.5.1"}
 pydantic-settings = "^2.1.0"
 slowapi = "^0.1.8"
 cloudinary = "^1.36.0"
+httpx = "^0.25.2"
 
 
 [tool.poetry.group.dev.dependencies]
 sphinx = "^7.2.6"
+pytest = "^7.4.3"
+faker = "^20.1.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
